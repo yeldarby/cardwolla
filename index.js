@@ -97,7 +97,10 @@ app.all('/account', function(req, res) {
 		json: true
 	}, function(error, response, body) {
 		if(body && body.error) {
-			errorPage(res, body.error, body.error_description);
+			errorPage(res, body.error, body.error_description, JSON.stringify({
+				host: req.host,
+				code: req.query.code
+			}, undefined, 4));
 			return;	
 		}
 		
