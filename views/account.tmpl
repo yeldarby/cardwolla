@@ -89,8 +89,14 @@
 		{{#if cards}}
 			<h1>Your Linked Cards</h1>
 			{{#each cards}}
-				{{@key}} {{this.type}} {{this.exp_month}} {{this.exp_year}}<br />
-				
+				<div class="card {{this.type}}" hash="{{@key}}">
+					<div class="card_bg"></div>
+					<div class="card_number">**** **** **** ****</div>
+					<div class="card_exp_text">Exp.</div>
+					<div class="card_expiration">{{this.exp_month}}/{{this.exp_year}}</div>
+					<div class="card_type">{{this.type}}</div>
+					<div class="card_linked">Card linked {{this.time_linked}}</div>
+				</div>
 			{{/each}}
 		
 			<h1>Link Another Card</h1>

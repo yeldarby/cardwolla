@@ -8,6 +8,7 @@ var _ = require('underscore');
 var request = require('request');
 var hbs = require('hbs');
 var crypto = require('crypto');
+var moment = require('moment');
 
 require(process.env.HOME + '/statesecrets/DwollaCredentials.js');
 require(process.env.HOME + '/statesecrets/Salt.js');
@@ -131,6 +132,10 @@ app.all('/account', function(req, res) {
 			fbUser.child('cards').once('value', function(snapshot) {
 				var cardData = snapshot.val();
 				
+				_.each(cardData, function(card) {
+					if(card.time_linked) card.time_linked = moment(card.time_linked).fromNow();
+				});
+				
 				res.render('account.tmpl', {
 					access_token: access_token,
 					cards: cardData
@@ -171,7 +176,8 @@ app.post('/api/link', function(req, res) {
 		firebase_root.child('Users').child(body.Response.Id).child('cards').child(hash).set({
 			type: cardFromNumber(req.body.card),
 			exp_month: req.body.exp_month,
-			exp_year: req.body.exp_year
+			exp_year: req.body.exp_year,
+			time_linked: Firebase.ServerValue.TIMESTAMP
 		});
 		
 		firebase_root.child('Cards').child(hash).set(body.Response.Id);
