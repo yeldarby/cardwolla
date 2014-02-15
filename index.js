@@ -84,6 +84,10 @@ app.all('/', function(req, res) {
 	res.sendfile(__dirname + '/public/index.html');
 });
 
+app.get('/example', function(req, res) {
+	res.render('example.tmpl', {});
+});
+
 app.all('/account', function(req, res) {
 	if(!req.query || !req.query.code) {
 		errorPage(res, "Missing Code", "How can you eat your access token if you don't receive your code?!");
@@ -145,6 +149,7 @@ app.all('/account', function(req, res) {
 				
 				_.each(cardData, function(card) {
 					if(card.time_linked) card.time_linked = moment(card.time_linked).fromNow();
+					if(card.time_linked == 'in a few seconds') card.time_linked = 'a few seconds ago';
 				});
 				
 				res.render('account.tmpl', {
