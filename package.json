@@ -1,0 +1,13 @@
+{
+	"name": "cardwolla",
+	"description": "PennApps 2014 Project",
+	"author": "Brad Dwyer <yeldarb@iastate.edu>",
+	"dependencies": {
+		"express": "",
+		"firebase": "",
+		"firebase-token-generator": "",
+		"underscore": "",
+		"request": "",
+		"hbs": ""
+	}
+}
