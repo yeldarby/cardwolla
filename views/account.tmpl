@@ -25,6 +25,13 @@
 	var access_token = '{{access_token}}';
 	
 	$(function() {
+		$('#scanner_form').submit(function(e) {
+			e.preventDefault();
+			
+			var raw = $('#scanner_input').val()
+			console.log(raw.split('='));
+		});
+	
 		$('#add_card').submit(function(e) {
 			e.preventDefault();
 			
@@ -157,6 +164,13 @@
 				</div>
 				<br /><br />
 				<button type="submit" class="btn btn-primary btn-lg">Add Card</button>
+			</form>
+			<br /><br />
+			
+			<h2>Have a Card Reader?</h2>
+			<button type="submit" class="btn btn-default btn-lg">Scan Card</button>
+			<form id="scanner_form">
+				<input type="text" id="scanner_input" />
 			</form>
 	</div>
 
