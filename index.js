@@ -8,10 +8,7 @@ var _ = require('underscore');
 var request = require('request');
 var hbs = require('hbs');
 
-var Dwolla = {
-	client_id: 'omoEV76AYr7MemVMRGF98K2JaQV+iWLAoO/0+K7P1HtH+mzXlP',
-	secret: '+X4Km7BtUR/LnO22d95pNbm2wR0mIj1Yle4XKvaxfREfLj21v1'	
-};
+require(process.env.HOME + '/statesecrets/DwollaCredentials.js');
 
 var app = express();
 
