@@ -91,15 +91,17 @@ app.all('/account', function(req, res) {
 	}
 
 	var code = req.query.code;
+	var url = 'https://www.dwolla.com/oauth/v2/token?client_id=' + encodeURIComponent(Dwolla.client_id) + '&client_secret=' + encodeURIComponent(Dwolla.secret) + '&grant_type=authorization_code&redirect_uri=' + encodeURIComponent('https://' + req.host + '/account') + '&code=' + encodeURIComponent(req.query.code);
 
 	request.get({
-		url: 'https://www.dwolla.com/oauth/v2/token?client_id=' + encodeURIComponent(Dwolla.client_id) + '&client_secret=' + encodeURIComponent(Dwolla.secret) + '&grant_type=authorization_code&redirect_uri=' + encodeURIComponent('https://' + req.host + '/account') + '&code=' + req.query.code,
+		url: url,
 		json: true
 	}, function(error, response, body) {
 		if(body && body.error) {
 			errorPage(res, body.error, body.error_description, JSON.stringify({
 				host: req.host,
-				code: req.query.code
+				code: req.query.code,
+				url: url
 			}, undefined, 4));
 			return;	
 		}
@@ -112,7 +114,7 @@ app.all('/account', function(req, res) {
 		var access_token = body.access_token;
 		
 		request.get({
-			url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + access_token,
+			url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(access_token),
 			json: true
 		}, function(error, response, body) {
 			if(body && body.error) {
@@ -163,7 +165,7 @@ app.post('/api/link', function(req, res) {
 	}
 	
 	request.get({
-		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + req.body.access_token,
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(req.body.access_token),
 		json: true
 	}, function(error, response, body) {
 		if(body && body.error) {
@@ -186,6 +188,7 @@ app.post('/api/link', function(req, res) {
 			type: cardFromNumber(req.body.card),
 			exp_month: req.body.exp_month,
 			exp_year: req.body.exp_year,
+			last_two: req.body.card.substring(req.body.card.length-2),
 			time_linked: Firebase.ServerValue.TIMESTAMP
 		});
 		
@@ -207,7 +210,7 @@ app.post('/api/unlink', function(req, res) {
 	}
 	
 	request.get({
-		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + req.body.access_token,
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(req.body.access_token),
 		json: true
 	}, function(error, response, body) {
 		if(body && body.error) {
