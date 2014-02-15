@@ -12,11 +12,23 @@ var crypto = require('crypto');
 require(process.env.HOME + '/statesecrets/DwollaCredentials.js');
 require(process.env.HOME + '/statesecrets/Salt.js');
 
-var shasum = crypto.createHash('sha512');
+var shasum;
+var strength = 100; // how many times should we sha512 it
 
 function computeHash(val) {
-	shasum.update(Salt.before + val + Salt.after);
-	return shasum.digest('base64');
+	var before = Salt.before + val + Salt.after;
+	
+	for(var i=1; i<strength; i++) {
+		shasum = crypto.createHash('sha512');
+		shasum.update(before);
+		before = shasum.digest('base64');
+	}
+	
+	shasum = crypto.createHash('sha512');
+	shasum.update(before);
+	var ret = shasum.digest('base64');
+	ret = ret.replace(/\//g, '*');
+	return ret;
 }
 
 
@@ -103,20 +115,124 @@ app.all('/account', function(req, res) {
 			}
 			
 			if(!body || !body.Success) {
-				errorPage(res, "Where is your access token?", "Dwolla should have sent one back but they must have lost it...");
+				errorPage(res, "We didn't get a success?", "Nor did we get an error... what a conundrum.");
 				return;
 			}
 			
-			firebase_root.child('Users').child(body.Response.Id).update({
+			var fbUser = firebase_root.child('Users').child(body.Response.Id);
+			
+			fbUser.update({
 				access_token: access_token,
 				name: body.Response.Name,
 				city: body.Response.City,
 				state: body.Response.State
 			});
 			
-			res.render('account.tmpl', {
+			fbUser.child('cards').once('value', function(snapshot) {
+				var cardData = snapshot.val();
 				
+				res.render('account.tmpl', {
+					access_token: access_token,
+					cards: cardData
+				});
 			});
+		});
+	});
+});
+
+app.post('/api/link', function(req, res) {
+	if(!req || !req.body || !req.body.access_token || !req.body.card || !req.body.exp_month || !req.body.exp_year) {
+		res.json({
+			error: 'You must POST an access_token, a card, an exp_month, and an exp_year.'
+		});
+		return;
+	}
+	
+	request.get({
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + req.body.access_token,
+		json: true
+	}, function(error, response, body) {
+		if(body && body.error) {
+			res.json({
+				error: error_message
+			});
+			return;	
+		}
+		
+		if(!body || !body.Success) {
+			res.json({
+				error:  "We didn't get a success? Nor did we get an error... what a conundrum."
+			});
+			return;
+		}
+		
+		var hash = computeHash(req.body.card);
+		
+		firebase_root.child('Users').child(body.Response.Id).child('cards').child(hash).set({
+			type: cardFromNumber(req.body.card),
+			exp_month: req.body.exp_month,
+			exp_year: req.body.exp_year
+		});
+		
+		firebase_root.child('Cards').child(hash).set(body.Response.Id);
+		
+		res.json({
+			success: true,
+			hash: hash
+		});
+	});
+});
+
+app.post('/api/unlink', function(req, res) {
+	if(!req || !req.body || !req.body.access_token || !req.body.hash) {
+		res.json({
+			error: 'You must POST an access_token, and a hash.'
+		});
+		return;
+	}
+	
+	request.get({
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + req.body.access_token,
+		json: true
+	}, function(error, response, body) {
+		if(body && body.error) {
+			res.json({
+				error: error_message
+			});
+			return;	
+		}
+		
+		if(!body || !body.Success) {
+			res.json({
+				error:  "We didn't get a success? Nor did we get an error... what a conundrum."
+			});
+			return;
+		}
+		
+		var fbHash = firebase_root.child('Users').child(body.Response.Id).child('cards').child(req.body.hash);
+		
+		fbHash.once('value', function(snapshot) {
+			var val = snapshot.val();
+			if(!val) {
+				res.json({
+					error: 'Card with that hash not found for this user.'
+				});
+				return;
+			}
+			
+			fbHash.remove();
+			firebase_root.child('Cards').child(req.body.hash).remove();
+			
+			res.json({
+				success: true
+			});
+		});
+		
+		firebase_root.child('Cards').child(hash).set(body.Response.Id);
+		
+		res.json({
+			success: true,
+			hash: hash
 		});
 	});
 });
@@ -134,3 +250,72 @@ function errorPage(res, title, message) {
 		stack: new Error().stack
 	});
 }
+
+var cards = [
+	{
+		type: 'maestro',
+		pattern: /^(5018|5020|5038|6304|6759|676[1-3])/,
+		length: [12, 13, 14, 15, 16, 17, 18, 19],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'dinersclub',
+		pattern: /^(36|38|30[0-5])/,
+		length: [14],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'laser',
+		pattern: /^(6304|6706|6771|6709)/,
+		length: [16, 17, 18, 19],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'jcb',
+		pattern: /^35/,
+		length: [16],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'unionpay',
+		pattern: /^62/,
+		length: [16, 17, 18, 19],
+		luhn: false
+	}, {
+		type: 'discover',
+		pattern: /^(6011|65|64[4-9]|622)/,
+		length: [16],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'mastercard',
+		pattern: /^5[1-5]/,
+		length: [16],
+		cvcLength: [3],
+		luhn: true
+	}, {
+		type: 'amex',
+		pattern: /^3[47]/,
+		length: [15],
+		cvcLength: [4],
+		luhn: true
+	}, {
+		type: 'visa',
+		pattern: /^4/,
+		length: [13, 14, 15, 16],
+		cvcLength: [3],
+		luhn: true
+	}
+];
+
+var cardFromNumber = function(num) {
+	var card, _i, _len;
+	num = (num + '').replace(/\D/g, '');
+	for (_i = 0, _len = cards.length; _i < _len; _i++) {
+		card = cards[_i];
+		if (card.pattern.test(num)) {
+			return card.type;
+		}
+	}
+	return 'unknown';
+};

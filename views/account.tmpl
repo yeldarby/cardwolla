@@ -22,6 +22,8 @@
 	<link href="/styles/landing-page.css" rel="stylesheet">
 	
 	<script>
+	var access_token = '{{access_token}}';
+	
 	$(function() {
 		$('#add_card').submit(function(e) {
 			e.preventDefault();
@@ -85,7 +87,13 @@
 	
 	<div class="card-content">
 		{{#if cards}}
-			<h1>Link another card</h1>
+			<h1>Your Linked Cards</h1>
+			{{#each cards}}
+				{{@key}} {{this.type}} {{this.exp_month}} {{this.exp_year}}<br />
+				
+			{{/each}}
+		
+			<h1>Link Another Card</h1>
 		{{else}}
 			<h1>You Haven't Linked any Cards</h1>
 			<p>Link your first card.</p><br />
