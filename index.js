@@ -31,6 +31,17 @@ app.configure('development', function() {
 	app.engine('tmpl', require('hbs').__express);
 	
 	app.use(express.static(__dirname + '/public'));
+	
+	app.use(function(req, res, next) {
+		if(req && req.query && req.query.error) {
+			res.render('error.tmpl', {
+				title: req.query.error,
+				message: req.query.error_description
+			});
+		} else {
+			next();
+		}
+	});
 });
 
 var firebase_root_url = 'https://cardwolla.firebaseio.com';
@@ -47,8 +58,14 @@ console.log('Firebase admin token:', adminToken);
 
 firebase_root.auth(adminToken);
 
-app.post('/', function(req, res) {
+app.all('/', function(req, res) {
 	res.sendfile(__dirname + '/public/index.html');
+});
+
+app.all('/account', function(req, res) {
+	res.json({
+		loggedIn: true
+	});
 });
 
 http.createServer(app).listen(80);

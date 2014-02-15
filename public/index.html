@@ -22,7 +22,12 @@
 	<script>
 		$(function() {
 			$('.connect').click(function() {
-				alert("We're not quite ready for primetime yet. But thanks for your interest! Check back soon.");
+				var client_id = encodeURIComponent('omoEV76AYr7MemVMRGF98K2JaQV+iWLAoO/0+K7P1HtH+mzXlP');
+				var redirect_uri = encodeURIComponent('https://' + window.location.hostname + '/account');
+				var scope = encodeURIComponent(['AccountInfoFull', 'Transactions', 'Balance', 'Send'].join('|'));
+				
+				window.location.href = 'https://www.dwolla.com/oauth/v2/authenticate?client_id=' + client_id + '&response_type=code&redirect_uri=' + redirect_uri +'&scope=' + scope;
+				
 			});
 		});
 	</script>
