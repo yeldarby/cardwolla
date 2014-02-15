@@ -9,6 +9,7 @@
 		"underscore": "",
 		"request": "",
 		"hbs": "",
-		"moment": ""
+		"moment": "",
+		"stripe": ""
 	}
 }

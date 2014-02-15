@@ -10,6 +10,9 @@ var hbs = require('hbs');
 var crypto = require('crypto');
 var moment = require('moment');
 
+require(process.env.HOME + '/statesecrets/StripeCredentials.js');
+var stripe = require('stripe')(Stripe.test_secret);
+
 require(process.env.HOME + '/statesecrets/DwollaCredentials.js');
 require(process.env.HOME + '/statesecrets/Salt.js');
 
@@ -276,6 +279,35 @@ app.get('/api/hasdwolla', function(req, res) {
 		} else {
 			res.json({
 				hasdwolla: false
+			});
+		}
+	});
+});
+
+app.post('/api/transact/credit', function(req, res) {
+	if(!req || !req.body || !req.body.stripe_token) {
+		res.json({
+			error: 'You must POST a stripe_token.'
+		});
+		return;
+	}
+	
+	var stripeToken = req.body.stripe_token;
+	
+	var charge = stripe.charges.create({
+		amount: 100, // amount in cents, again
+		currency: "usd",
+		card: stripeToken,
+		description: "Cardwolla demo"
+	}, function(err, charge) {
+		if (err && err.type === 'StripeCardError') {
+			res.json({
+				error: err
+			});
+			// The card has been declined
+		} else {
+			res.json({
+				success: true
 			});
 		}
 	});
