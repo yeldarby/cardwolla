@@ -7,8 +7,18 @@ var FirebaseTokenGenerator = require('firebase-token-generator');
 var _ = require('underscore');
 var request = require('request');
 var hbs = require('hbs');
+var crypto = require('crypto');
 
 require(process.env.HOME + '/statesecrets/DwollaCredentials.js');
+require(process.env.HOME + '/statesecrets/Salt.js');
+
+var shasum = crypto.createHash('sha512');
+
+function computeHash(val) {
+	shasum.update(Salt.before + val + Salt.after);
+	return shasum.digest('base64');
+}
+
 
 var app = express();
 
