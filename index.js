@@ -67,8 +67,21 @@ app.all('/account', function(req, res) {
 		return;
 	}
 
-	res.json({
-		loggedIn: true
+	request.get({
+		url: 'https://www.dwolla.com/oauth/v2/token?client_id=' + encodeURIComponent(Dwolla.client_id) + '&client_secret=' + encodeURIComponent(Dwolla.secret) + '&grant_type=authorization_code&redirect_uri=' + encodeURIComponent('https://' + req.host + '/account') + '&code=' + req.query.code,
+		json: true
+	}, function(error, response, body) {
+		if(body && body.error) {
+			errorPage(res, body.error, body.error_description);
+			return;	
+		}
+		
+		res.json({
+			loggedIn: req.query.code,
+			client_id: Dwolla.client_id,
+			hostname: req.host,
+			body: body.access_token
+		});
 	});
 });
 
