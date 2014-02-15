@@ -28,8 +28,53 @@
 		$('#scanner_form').submit(function(e) {
 			e.preventDefault();
 			
-			var raw = $('#scanner_input').val()
-			console.log(raw.split('='));
+			var raw = $('#scanner_input').val();
+			$('#scanner_input').val('').blur();
+			
+			var cardParts = raw.split('=');
+			
+			var card_number = cardParts[0];
+			var exp_month = cardParts[1].substring(2, 4);
+			var exp_year = '20' + cardParts[1].substring(0, 2);
+			
+			$('#add_card').hide();
+			$('#scan_card').hide();
+			
+			$.post('/api/link', {
+
+				card: card_number,
+				access_token: access_token,
+				exp_month: exp_month,
+				exp_year: exp_year
+			
+			}, function(response) {
+			
+				if(response.error) {
+					$('#add_card').show();
+					$('#scan_card').show();
+					alert('Error: ' + response.error);
+				} else if(response.success) {
+					window.location.reload();
+				}
+			
+			}, 'JSON');
+		});
+		
+		$('#scan_button').click(function(e) {
+			e.preventDefault();
+			
+			setTimeout(function() {
+				$('#scanning').show();
+				$('#scanner_input').val('').focus();
+				$('#scan_button').hide();
+			});
+		});
+		
+		$('#scan_button').click();
+	
+		$('#scanner_input').blur(function() {
+			$('#scanning').hide();
+			$('#scan_button').show();
 		});
 	
 		$('#add_card').submit(function(e) {
@@ -38,6 +83,7 @@
 			if(!validate()) return;
 			
 			$('#add_card').hide();
+			$('#scan_card').hide();
 			
 			var card_number = $('#card_number').val().replace(/\s+/g,'');
 			var expiration = $('#card_exp').val().replace(/\s+/g,'').split('/');
@@ -55,6 +101,7 @@
 			
 				if(response.error) {
 					$('#add_card').show();
+					$('#scan_card').show();
 					alert('Error: ' + response.error);
 				} else if(response.success) {
 					window.location.reload();
@@ -167,11 +214,14 @@
 			</form>
 			<br /><br />
 			
+			<div id="scan_card">
 			<h2>Have a Card Reader?</h2>
-			<button type="submit" class="btn btn-default btn-lg">Scan Card</button>
-			<form id="scanner_form">
+			<button type="submit" class="btn btn-default btn-lg" id="scan_button">Scan Card</button>
+			<form id="scanner_form" style="position: absolute; top: -1000px;">
 				<input type="text" id="scanner_input" />
 			</form>
+			<div id="scanning" style="display: none; color: #666;"><h3>Scan your card now.</h3></div>
+			</div>
 	</div>
 
 	<footer>
