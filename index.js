@@ -45,7 +45,7 @@ app.configure('development', function() {
 
 var firebase_root_url = 'https://cardwolla.firebaseio.com';
 var firebase_root = new Firebase(firebase_root_url);
-var tokenGenerator = new FirebaseTokenGenerator('zqObmd1CMMc0AnsR2UbqZSi4fpw5ZZtTcZm2xEHd');
+var tokenGenerator = new FirebaseTokenGenerator('guYIxlAsh207AG6yY1PljQodWvJ3gkVWuxUFcSg7');
 
 var adminToken = tokenGenerator.createToken({}, {
 	admin: true,
@@ -76,11 +76,37 @@ app.all('/account', function(req, res) {
 			return;	
 		}
 		
-		res.json({
-			loggedIn: req.query.code,
-			client_id: Dwolla.client_id,
-			hostname: req.host,
-			body: body.access_token
+		if(!body || !body.access_token) {
+			errorPage(res, "Where is your access token?", "Dwolla should have sent one back but they must have lost it...");
+			return;
+		}
+		
+		var access_token = body.access_token;
+		
+		request.get({
+			url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + body.access_token,
+			json: true
+		}, function(error, response, body) {
+			if(body && body.error) {
+				errorPage(res, body.error, body.error_description);
+				return;	
+			}
+			
+			if(!body || !body.Success) {
+				errorPage(res, "Where is your access token?", "Dwolla should have sent one back but they must have lost it...");
+				return;
+			}
+			
+			firebase_root.child('Users').child(body.Response.Id).update({
+				access_token: access_token,
+				name: body.Response.Name,
+				city: body.Response.City,
+				state: body.Response.State
+			});
+			
+			res.render('account.tmpl', {
+				
+			});
 		});
 	});
 });
@@ -94,6 +120,7 @@ https.createServer({
 function errorPage(res, title, message) {
 	res.render('error.tmpl', {
 		title: title,
-		message: message
+		message: message,
+		stack: new Error().stack
 	});
 }

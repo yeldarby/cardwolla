@@ -157,3 +157,9 @@ p.copyright {
 .btn-lg {
 	font-size: 25px;
 }
+
+.card-content {
+	margin: 50px 0 10px 0;
+	padding: 10px;
+	text-align: center;
+}
