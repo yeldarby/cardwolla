@@ -11,6 +11,14 @@ var hbs = require('hbs');
 var app = express();
 
 app.configure('development', function() {
+	app.use(function(req,res,next) {
+		if (!/https/.test(req.protocol)){
+			res.redirect("https://" + req.headers.host + req.url);
+		} else {
+			return next();
+		} 
+	});
+
 	app.use(express.bodyParser());
 	app.use(express.errorHandler());
 	app.use(express.compress());
