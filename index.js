@@ -188,6 +188,7 @@ app.post('/api/link', function(req, res) {
 			type: cardFromNumber(req.body.card),
 			exp_month: req.body.exp_month,
 			exp_year: req.body.exp_year,
+			first: req.body.card.substring(0, 1),
 			last_two: req.body.card.substring(req.body.card.length-2),
 			time_linked: Firebase.ServerValue.TIMESTAMP
 		});
