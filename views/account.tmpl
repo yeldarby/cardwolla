@@ -39,10 +39,10 @@
 			
 			$.post('/api/link', {
 
-			card: card_number,
-			access_token: access_token,
-			exp_month: expiration[0],
-			exp_year: expiration[1]
+				card: card_number,
+				access_token: access_token,
+				exp_month: expiration[0],
+				exp_year: expiration[1]
 			
 			}, function(response) {
 			
@@ -54,6 +54,27 @@
 				}
 			
 			}, 'JSON');
+		});
+		
+		$('.card_delete').click(function() {
+			if(confirm('Are you sure you want to delete this card?')) {
+				var hash = $(this).parents('.card').attr('hash');
+				
+				$.post('/api/link', {
+					
+					access_token: access_token,
+					hash: hash
+				
+				}, function(response) {
+				
+					if(response.error) {
+						alert('Error: ' + response.error);
+					} else if(response.success) {
+						window.location.reload();
+					}
+				
+				}, 'JSON');
+			}
 		});
 		
 		$('#card_number').formatCardNumber();
@@ -115,6 +136,7 @@
 					<div class="card_expiration">{{this.exp_month}}/{{this.exp_year}}</div>
 					<div class="card_type">{{this.type}}</div>
 					<div class="card_linked">Card linked {{this.time_linked}}</div>
+					<div class="card_delete">X</div>
 				</div>
 			{{/each}}
 		

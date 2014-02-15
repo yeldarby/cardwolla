@@ -107,7 +107,7 @@ app.all('/account', function(req, res) {
 		var access_token = body.access_token;
 		
 		request.get({
-			url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + body.access_token,
+			url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + access_token,
 			json: true
 		}, function(error, response, body) {
 			if(body && body.error) {
@@ -116,7 +116,10 @@ app.all('/account', function(req, res) {
 			}
 			
 			if(!body || !body.Success) {
-				errorPage(res, "We didn't get a success?", "Nor did we get an error... what a conundrum.");
+				errorPage(res, "We didn't get a success?", "Nor did we get an error... what a conundrum.", JSON.stringify({
+					access_token: access_token,
+					body: body
+				}, undefined, 4));
 				return;
 			}
 			
@@ -249,11 +252,12 @@ https.createServer({
 	cert: fs.readFileSync(process.env.HOME + '/statesecrets/cardwolla.crt')
 }, app).listen(443);
 
-function errorPage(res, title, message) {
+function errorPage(res, title, message, dump) {
 	res.render('error.tmpl', {
 		title: title,
 		message: message,
-		stack: new Error().stack
+		stack: new Error().stack,
+		dump: dump
 	});
 }
 
