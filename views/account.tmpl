@@ -26,14 +26,49 @@
 		$('#add_card').submit(function(e) {
 			e.preventDefault();
 			
-			var card_number = $('#card_number').val();
-			var expiration = $('#card_exp').val();
+			if(!validate()) return;
+			
+			var card_number = $('#card_number').val().replace(/\s+/g,'');
+			var expiration = $('#card_exp').val().replace(/\s+/g,'').split('/');
+			
 			
 			console.log(card_number, expiration);
 		});
 		
 		$('#card_number').formatCardNumber();
 		$('#card_exp').formatCardExpiry();
+		
+		var validate = function() {
+			var valid = true;
+			
+			var card_number = $('#card_number').val();
+			var expiration = $('#card_exp').val().replace(/\s+/g,'').split('/');
+			
+			if(!$.validateCardNumber(card_number)) {
+				valid = false;
+				$('#card_number').parents('.form-group').addClass('has-error');
+			} else {
+				$('#card_number').parents('.form-group').removeClass('has-error');
+			}
+			
+			if(expiration.length != 2 || (!$.validateCardExpiry(expiration[0], expiration[1]) && !$.validateCardExpiry(expiration[0], '20'+expiration[1]))) {
+				valid = false;
+				$('#card_exp').parents('.form-group').addClass('has-error');
+			} else {
+				$('#card_exp').parents('.form-group').removeClass('has-error');
+			}
+			
+			return valid;
+		}
+		
+		$('#card_number').keyup(validate);
+		$('#card_exp').keyup(validate);
+		
+		$('#card_number').blur(validate);
+		$('#card_exp').blur(validate);
+		
+		$('#card_number').focus(validate);
+		$('#card_exp').focus(validate);
 	});
 	</script>
 </head>
@@ -58,11 +93,11 @@
 		
 			<form class="form-inline" role="form" id="add_card" autocomplete="on" pattern="\d*">
 				<div class="form-group">
-					<label class="inline-lbl" for="card_number">Card Number</label>
+					<label class="inline-lbl control-label" for="card_number">Card Number</label>
 					<input type="text" class="form-control input-lg" id="card_number" placeholder="1111 2222 3333 4444" />
 				</div>
 				<div class="form-group">
-					<label class="inline-lbl" for="exp">Expiration</label>
+					<label class="inline-lbl control-label" for="exp">Expiration</label>
 					<input type="text" class="form-control input-lg" id="card_exp" placeholder="12/2020" />
 				</div>
 				<br /><br />
