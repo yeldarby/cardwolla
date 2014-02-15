@@ -8,6 +8,11 @@ var _ = require('underscore');
 var request = require('request');
 var hbs = require('hbs');
 
+var Dwolla = {
+	client_id: 'omoEV76AYr7MemVMRGF98K2JaQV+iWLAoO/0+K7P1HtH+mzXlP',
+	secret: '+X4Km7BtUR/LnO22d95pNbm2wR0mIj1Yle4XKvaxfREfLj21v1'	
+};
+
 var app = express();
 
 app.configure('development', function() {
@@ -34,10 +39,7 @@ app.configure('development', function() {
 	
 	app.use(function(req, res, next) {
 		if(req && req.query && req.query.error) {
-			res.render('error.tmpl', {
-				title: req.query.error,
-				message: req.query.error_description
-			});
+			errorPage(res, req.query.error, req.query.error_description);
 		} else {
 			next();
 		}
@@ -63,6 +65,11 @@ app.all('/', function(req, res) {
 });
 
 app.all('/account', function(req, res) {
+	if(!req.query || !req.query.code) {
+		errorPage(res, "Missing Code", "How can you eat your access token if you don't receive your code?!");
+		return;
+	}
+
 	res.json({
 		loggedIn: true
 	});
@@ -73,3 +80,10 @@ https.createServer({
 	key: fs.readFileSync(process.env.HOME + '/statesecrets/cardwolla.key'),
 	cert: fs.readFileSync(process.env.HOME + '/statesecrets/cardwolla.crt')
 }, app).listen(443);
+
+function errorPage(res, title, message) {
+	res.render('error.tmpl', {
+		title: title,
+		message: message
+	});
+}
