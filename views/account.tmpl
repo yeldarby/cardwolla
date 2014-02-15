@@ -60,7 +60,7 @@
 			if(confirm('Are you sure you want to delete this card?')) {
 				var hash = $(this).parents('.card').attr('hash');
 				
-				$.post('/api/link', {
+				$.post('/api/unlink', {
 					
 					access_token: access_token,
 					hash: hash

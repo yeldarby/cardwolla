@@ -90,6 +90,8 @@ app.all('/account', function(req, res) {
 		return;
 	}
 
+	var code = req.query.code;
+
 	request.get({
 		url: 'https://www.dwolla.com/oauth/v2/token?client_id=' + encodeURIComponent(Dwolla.client_id) + '&client_secret=' + encodeURIComponent(Dwolla.secret) + '&grant_type=authorization_code&redirect_uri=' + encodeURIComponent('https://' + req.host + '/account') + '&code=' + req.query.code,
 		json: true
@@ -118,6 +120,7 @@ app.all('/account', function(req, res) {
 			if(!body || !body.Success) {
 				errorPage(res, "We didn't get a success?", "Nor did we get an error... what a conundrum.", JSON.stringify({
 					access_token: access_token,
+					code: code,
 					body: body
 				}, undefined, 4));
 				return;
@@ -237,12 +240,32 @@ app.post('/api/unlink', function(req, res) {
 			});
 		});
 		
-		firebase_root.child('Cards').child(hash).set(body.Response.Id);
-		
 		res.json({
-			success: true,
-			hash: hash
+			success: true
 		});
+	});
+});
+
+app.get('/api/hasdwolla', function(req, res) {
+	if(!req || !req.query || !req.query.card) {
+		res.json({
+			error: 'You must GET a card.'
+		});
+		return;
+	}
+	
+	var hash = computeHash(req.query.card);
+	firebase_root.child('Cards').child(hash).once('value', function(snapshot) {
+		var val = snapshot.val();
+		if(val) {
+			res.json({
+				hasdwolla: true
+			});
+		} else {
+			res.json({
+				hasdwolla: false
+			});
+		}
 	});
 });
 
