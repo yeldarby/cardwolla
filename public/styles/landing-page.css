@@ -258,3 +258,22 @@ p.copyright {
 	font-size: 14px;
 	text-shadow: none;
 }
+
+.loading .card-content {
+	display: none;
+}
+
+.loadbar {
+	display: none;
+	width: 100%;
+    text-align: center;
+    height: 500px;
+}
+
+.loading .loadbar {
+	display: block;
+}
+
+#spin {
+	display: inline-block;
+}
