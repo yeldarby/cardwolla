@@ -30,11 +30,30 @@
 			
 			if(!validate()) return;
 			
+			$('#add_card').hide();
+			
 			var card_number = $('#card_number').val().replace(/\s+/g,'');
 			var expiration = $('#card_exp').val().replace(/\s+/g,'').split('/');
 			
+			if(expiration[1].length == 2) expiration[1] = '20' + expiration[1];
 			
-			console.log(card_number, expiration);
+			$.post('/api/link', {
+
+			card: card_number,
+			access_token: access_token,
+			exp_month: expiration[0],
+			exp_year: expiration[1]
+			
+			}, function(response) {
+			
+				if(response.error) {
+					$('#add_card').show();
+					alert('Error: ' + response.error);
+				} else if(response.success) {
+					window.location.reload();
+				}
+			
+			}, 'JSON');
 		});
 		
 		$('#card_number').formatCardNumber();

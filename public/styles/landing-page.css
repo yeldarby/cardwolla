@@ -195,6 +195,9 @@ p.copyright {
 	margin: 10px;
 	
 	font-size: 20px;
+	
+	color: white;
+	text-shadow: 0px 1px black;
 }
 
 .card_bg {
