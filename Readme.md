@@ -10,15 +10,14 @@ Video Demo
 
 [![demo video](http://img.youtube.com/vi/5K_xvnWxKGk/0.jpg)](http://www.youtube.com/watch?v=5K_xvnWxKGk&feature=youtu.be)
 
-Try It Out!
-===========
+Try It Out (for free)!
+======================
 
 Cardwolla is live at [cardwolla.com](https://cardwolla.com). You'll just need a Dwolla account and a payment card.
 Then go to [cardwolla.com/example](https://cardwolla.com/example) and give it a try. Don't worry, your card won't
 be charged because it uses Stripe's sandbox.
 
-Your Dwolla account, on the other hand, will be charged $1 if you click the "Pay $1 With Dwolla" button so only do that
-if you're feeling generous.
+Dwolla payments are currently being sent to the Dwolla "reflector" so they will be sent right back to your account.
 
 Security
 ========
