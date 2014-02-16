@@ -8,7 +8,7 @@ both worlds.
 Video Demo
 ==========
 
-[![demo video](http://img.youtube.com/vi/5K_xvnWxKGk /0.jpg)](http://www.youtube.com/watch?v=5K_xvnWxKGk&feature=youtu.be)
+[![demo video](http://img.youtube.com/vi/5K_xvnWxKGk/0.jpg)](http://www.youtube.com/watch?v=5K_xvnWxKGk&feature=youtu.be)
 
 Try It Out!
 ===========
