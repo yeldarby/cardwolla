@@ -329,9 +329,9 @@ app.get('/api/hasdwolla', function(req, res) {
 });
 
 app.post('/api/transact/credit', function(req, res) {
-	if(!req || !req.body || !req.body.stripe_token) {
+	if(!req || !req.body || !req.body.stripe_token || !req.body.amount) {
 		res.json({
-			error: 'You must POST a stripe_token.'
+			error: 'You must POST a stripe_token and an amount.'
 		});
 		return;
 	}
@@ -339,7 +339,7 @@ app.post('/api/transact/credit', function(req, res) {
 	var stripeToken = req.body.stripe_token;
 	
 	var charge = stripe.charges.create({
-		amount: 100, // amount in cents, again
+		amount: req.body.amount, // amount in cents, again
 		currency: "usd",
 		card: stripeToken,
 		description: "Cardwolla demo"
@@ -354,6 +354,67 @@ app.post('/api/transact/credit', function(req, res) {
 				success: true
 			});
 		}
+	});
+});
+
+app.post('/api/transact/dwolla', function(req, res) {
+	if(!req || !req.body || !req.body.card || !req.body.exp_month || !req.body.exp_year || !req.body.destination || !req.body.amount) {
+		res.json({
+			error: 'You must POST a card, an exp_month, an exp_year, a destination, and an amount.'
+		});
+		return;
+	}
+	
+	var hash = computeHash(req.body.card);
+	firebase_root.child('Cards').child(hash).once('value', function(snapshot) {
+		var dwollaId = snapshot.val();
+		
+		if(!dwollaId) {
+			res.json({
+				error: 'Card not found.'
+			});
+			return;
+		}
+		
+		firebase_root.child('Users').child(dwollaId).once('value', function(snapshot) {
+			var val = snapshot.val();
+			
+			var card = val.cards && val.cards[hash];
+			if(!card || card.exp_month != req.body.exp_month || card.exp_year != req.body.exp_year) {
+				res.json({
+					error: 'Card did not match.'
+				});
+				return;
+			}
+			
+			req.body.amount /= 100;
+			req.body.amount = req.body.amount.toFixed(2);
+			
+			request.post({
+				url: 'https://www.dwolla.com/oauth/rest/transactions/send',
+				json: true,
+				json: {
+					oauth_token: val.access_token,
+					pin: val.pin,
+					destinationId: req.body.destination,
+					amount: req.body.amount
+				},
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}, function(error, response, body) {
+				if(body && body.Message == 'Success') {
+					res.json({
+						success: true
+					});
+				} else {
+					res.json({
+						error: 'Could not finish transaction.',
+						body: body
+					});	
+				}
+			});
+		});
 	});
 });
 

@@ -126,7 +126,8 @@
 						alert('Error: ' + response.error.message);
 					} else {
 						$.post('/api/transact/credit', {
-							stripe_token: response.id
+							stripe_token: response.id,
+							amount: 100
 						}, function(response) {
 							if(response.error) {
 								$('#paywithcc').show();
@@ -135,13 +136,32 @@
 							} else {
 								// show success screen
 								$('#theForm').hide();
-								$('#successDwolla').show();
+								$('#successCredit').show();
 							}
 						}, 'JSON');
 					}
 				});
 			} else if(network == 'dwolla') {
-				console.log('Pay with Dwolla');
+				$.post('/api/transact/dwolla', {
+
+					card: card_number,
+					exp_month: expiration[0],
+					exp_year: expiration[1],
+					destination: '812-713-9234',
+					amount: 100
+				
+				}, function(response) {
+					if(response.success) {
+						$('#theForm').hide();
+						$('#successDwolla').show();
+					} else {
+						$('#paywithdwolla').show();
+						submitting = false;
+								
+						console.log(response);
+						alert('Error: Could not process payment.');
+					}
+				});
 			}
 		});
 	});
@@ -260,6 +280,7 @@
 		<p>
 			Your account is properly setup and you may link
 			as many of your credit cards as you like.
+			<a href="/">Account Settings.</a>
 		</p>
 	</div>
 		
