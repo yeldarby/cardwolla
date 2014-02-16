@@ -283,3 +283,8 @@ p.copyright {
 #spin {
 	display: inline-block;
 }
+
+#scan_card, #email_container {
+	margin-top: 30px;
+	margin-bottom: 30px;
+}

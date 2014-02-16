@@ -10,6 +10,9 @@ var hbs = require('hbs');
 var crypto = require('crypto');
 var moment = require('moment');
 
+require(process.env.HOME + '/statesecrets/Sendgrid.js');
+var sendgrid = require('sendgrid')(Sendgrid.api_key, Sendgrid.api_secret);
+
 require(process.env.HOME + '/statesecrets/StripeCredentials.js');
 var stripe = require('stripe')(Stripe.test_secret);
 
@@ -160,7 +163,8 @@ app.all('/account', function(req, res) {
 				res.render('account.tmpl', {
 					access_token: access_token,
 					cards: cardData,
-					pin: val.pin
+					pin: val.pin,
+					email: val.email
 				});
 			});
 		});
@@ -201,6 +205,40 @@ app.post('/api/pin', function(req, res) {
 		}
 		
 		firebase_root.child('Users').child(body.Response.Id).child('pin').set(req.body.pin, function() {
+			res.json({
+				success: true
+			});
+		});
+	});
+});
+
+app.post('/api/email', function(req, res) {
+	if(!req || !req.body || !req.body.access_token || !req.body.email) {
+		res.json({
+			error: 'You must POST an access_token, and a email.'
+		});
+		return;
+	}
+	
+	request.get({
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(req.body.access_token),
+		json: true
+	}, function(error, response, body) {
+		if(body && body.error) {
+			res.json({
+				error: error_message
+			});
+			return;	
+		}
+		
+		if(!body || !body.Success) {
+			res.json({
+				error:  "We didn't get a success? Nor did we get an error... what a conundrum."
+			});
+			return;
+		}
+		
+		firebase_root.child('Users').child(body.Response.Id).child('email').set(req.body.email, function() {
 			res.json({
 				success: true
 			});
@@ -388,7 +426,6 @@ app.post('/api/transact/dwolla', function(req, res) {
 			}
 			
 			req.body.amount /= 100;
-			req.body.amount = req.body.amount.toFixed(2);
 			
 			request.post({
 				url: 'https://www.dwolla.com/oauth/rest/transactions/send',
@@ -397,7 +434,7 @@ app.post('/api/transact/dwolla', function(req, res) {
 					oauth_token: val.access_token,
 					pin: val.pin,
 					destinationId: req.body.destination,
-					amount: req.body.amount
+					amount: req.body.amount.toFixed(2)
 				},
 				headers: {
 					'Content-Type': 'application/json'
@@ -407,6 +444,35 @@ app.post('/api/transact/dwolla', function(req, res) {
 					res.json({
 						success: true
 					});
+					
+					
+					request.get({
+						url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(val.access_token),
+						json: true
+					}, function(error, response, body) {
+						if(!body || !body.Response || !body.Response.Id) return;
+					
+						var dwollaId = body.Response.Id;
+						
+						firebase_root.child('Users').child(dwollaId).child('email').once('value', function(snapshot) {
+							var email = snapshot.val();
+							if(email) {
+								// Send a receipt message to the sender
+								
+								var savings = 0.3 + 0.29*req.body.amount/100;
+								
+								sendgrid.send({
+									to:       email,
+									from:     'receipts@cardwolla.com',
+									subject:  'Your payment receipt',
+									text:     'Your payment of $' + req.body.amount + ' was completed successfully via Dwolla. You saved this merchant $' + savings.toFixed(2) + '! They will be very grateful.'
+								}, function(err, json) {
+									// dont care
+								});
+							}
+						});
+					});
+					
 				} else {
 					res.json({
 						error: 'Could not finish transaction.',

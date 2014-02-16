@@ -10,6 +10,7 @@
 		"request": "",
 		"hbs": "",
 		"moment": "",
-		"stripe": ""
+	 	"stripe": "",
+	 	"sendgrid": ""
 	}
 }

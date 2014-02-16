@@ -215,6 +215,23 @@
 				}
 			});
 		});
+		
+		$('#save_email').submit(function(e) {
+			e.preventDefault();
+			
+			$('#email_btn').hide();
+			$.post('/api/email', {
+				access_token: access_token,
+				email: $('#email').val()
+			}, function(response) {
+				$('#email_btn').show();
+				if(response && response.success) {
+					
+				} else {
+					alert('Error: ' + response.error);
+				}
+			});
+		});
 	});
 	</script>
 </head>
@@ -274,7 +291,8 @@
 				<br /><br />
 				<button type="submit" class="btn btn-primary btn-lg">Add Card</button>
 			</form>
-			<br /><br />
+			
+			<hr />
 			
 			<div id="scan_card">
 			<h2>Have a Card Reader?</h2>
@@ -283,6 +301,20 @@
 				<input type="text" id="scanner_input" />
 			</form>
 			<div id="scanning" style="display: none; color: #666;"><h3>Scan your card now.</h3></div>
+			</div>
+			
+			<hr />
+			
+			<div id="email_container">
+				<h2>Add your email</h2>
+				<form class="form-inline" role="form" id="save_email" autocomplete="on">
+					<div class="form-group">
+						<label class="inline-lbl control-label" for="email">Email Address</label>
+						<input class="form-control input-lg" id="email" placeholder="you@example.com" value="{{email}}" />
+					</div><br /><br />
+					
+					<button id="email_btn" type="submit" class="btn btn-primary btn-lg">Save Email</button>
+				</form>
 			</div>
 	</div>
 

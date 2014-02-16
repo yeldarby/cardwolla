@@ -129,7 +129,7 @@
 							stripe_token: response.id,
 							amount: 100
 						}, function(response) {
-							if(response.error) {
+							if(false && response.error) {
 								$('#paywithcc').show();
 								submitting = false;
 								alert('Error: ' + JSON.stringify(response.error));
@@ -246,7 +246,7 @@
 			<form class="form-inline" role="form" id="submit_payment" autocomplete="on" pattern="\d*">
 				<div class="form-group">
 					<label class="inline-lbl control-label" for="card_number">Card Number</label>
-					<input type="text" class="form-control input-lg" id="card_number" placeholder="1111 2222 3333 4444" data-stripe="number" />
+					<input type="password" class="form-control input-lg" id="card_number" placeholder="1111 2222 3333 4444" data-stripe="number" />
 				</div>
 				<div class="form-group">
 					<label class="inline-lbl control-label" for="exp">Expiration</label>
