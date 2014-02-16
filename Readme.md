@@ -20,6 +20,13 @@ be charged because it uses Stripe's sandbox.
 Your Dwolla account, on the other hand, will be charged $1 if you click the "Pay $1 With Dwolla" button so only do that
 if you're feeling generous.
 
+Security
+========
+
+Cardwolla never stores your credit card number. I've tried my hardest to create a secure hash but I know there is always room for improvement when it comes to security. If you'd like to suggest a better way to do a one-way hash of a credit card number (while keeping it indexable) I'd love to hear from you!
+
+Currently we are using SHA512 with a shared salt 100 times.
+
 Feature Backlog
 ===============
 
