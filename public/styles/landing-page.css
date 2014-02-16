@@ -164,6 +164,12 @@ p.copyright {
 	text-align: center;
 }
 
+.pin-setup {
+	margin: 50px 0 10px 0;
+	padding: 10px;
+	text-align: center;
+}
+
 .inline-lbl {
 	display: block;
 	text-align: left;

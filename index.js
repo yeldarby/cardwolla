@@ -147,8 +147,10 @@ app.all('/account', function(req, res) {
 				state: body.Response.State
 			});
 			
-			fbUser.child('cards').once('value', function(snapshot) {
-				var cardData = snapshot.val();
+			fbUser.once('value', function(snapshot) {
+				var val = snapshot.val();
+			
+				var cardData = val.cards;
 				
 				_.each(cardData, function(card) {
 					if(card.time_linked) card.time_linked = moment(card.time_linked).fromNow();
@@ -157,8 +159,50 @@ app.all('/account', function(req, res) {
 				
 				res.render('account.tmpl', {
 					access_token: access_token,
-					cards: cardData
+					cards: cardData,
+					pin: val.pin
 				});
+			});
+		});
+	});
+});
+
+app.post('/api/pin', function(req, res) {
+	if(!req || !req.body || !req.body.access_token || !req.body.pin) {
+		res.json({
+			error: 'You must POST an access_token, and a pin.'
+		});
+		return;
+	}
+	
+	if(isNaN(Number(req.body.pin)) || req.body.pin.length != 4) {
+		res.json({
+			error: 'Your pin must be a numeric 4 digit code.'
+		});
+		return;
+	} 
+	
+	request.get({
+		url: 'https://www.dwolla.com/oauth/rest/users/?oauth_token=' + encodeURIComponent(req.body.access_token),
+		json: true
+	}, function(error, response, body) {
+		if(body && body.error) {
+			res.json({
+				error: error_message
+			});
+			return;	
+		}
+		
+		if(!body || !body.Success) {
+			res.json({
+				error:  "We didn't get a success? Nor did we get an error... what a conundrum."
+			});
+			return;
+		}
+		
+		firebase_root.child('Users').child(body.Response.Id).child('pin').set(req.body.pin, function() {
+			res.json({
+				success: true
 			});
 		});
 	});

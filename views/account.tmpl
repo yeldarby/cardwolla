@@ -191,6 +191,30 @@
 		};
 		var target = document.getElementById('spin');
 		var spinner = new Spinner(opts).spin(target);
+		
+		if(!$('#pin').val()) {
+			$('.card-content').hide();
+		} else {
+			$('.pin-setup').hide();
+		}
+		
+		$('#save_pin').submit(function(e) {
+			e.preventDefault();
+			
+			$.post('/api/pin', {
+				access_token: access_token,
+				pin: $('#pin').val()
+			}, function(response) {
+				if(response && response.success) {
+					$('.pin-setup').hide();
+					$('.card-content').show();
+					
+					$('#scan_button').click();
+				} else {
+					alert('Error: ' + response.error);
+				}
+			});
+		});
 	});
 	</script>
 </head>
@@ -204,6 +228,18 @@
 			</div>
 		</div>
 	</nav>
+	
+	<div class="pin-setup">
+		<h1>Enter Your Pin</h1><br />
+		<form class="form-inline" role="form" id="save_pin" autocomplete="off" pattern="\d*">
+			<div class="form-group">
+				<label class="inline-lbl control-label" for="pin">Dwolla Pin</label>
+				<input type="password" maxlength="4" class="form-control input-lg" id="pin" placeholder="1234" value="{{pin}}" />
+			</div><br /><br />
+			
+			<button type="submit" class="btn btn-primary btn-lg">Save Pin</button>
+		</form>
+	</div>
 	
 	<div class="card-content">
 		{{#if cards}}
