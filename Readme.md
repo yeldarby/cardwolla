@@ -29,9 +29,9 @@ Currently we are using SHA512 with a shared salt 100 times.
 Feature Backlog
 ===============
 
- - Suggestions? Send me a tweet [@braddwyer](http://www.twitter.com/braddwyer).
+ - Suggestions? Send our developer a tweet [@braddwyer](http://www.twitter.com/braddwyer).
 
 About this Project
 ==================
 
-This project was created for PennApps Winter 2014 by [Brad Dwyer](http://www.twitter.com/braddwyer).
+This project was created for PennApps Winter 2014 by Yeldarb LLC. All rights reserved.
