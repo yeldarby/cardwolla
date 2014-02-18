@@ -9,7 +9,7 @@
 
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/styles/bootstrap.min.css">
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	
 	<!-- Custom Google Web Font -->
@@ -35,7 +35,7 @@
 </head>
 
 <body>
-
+	<!--
 	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 		<div class="container">
 			<div class="navbar-header">
@@ -43,6 +43,7 @@
 			</div>
 		</div>
 	</nav>
+	-->
 
 	<div class="intro-header">
 
@@ -60,6 +61,7 @@
 									<i class="fa fa-sign-in fa-fw"></i>
 									<span class="network-name">Dwolla</span>
 								</a>
+								<div class="sign-in-text"><a href="#" class="connect">Sign in with Dwolla</a></div>
 							</li>
 						</ul>
 					</div>
@@ -77,17 +79,21 @@
 		<div class="container">
 
 			<div class="row">
-				<div class="col-lg-5 col-sm-6">
+				<div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
 					<hr class="section-heading-spacer">
 					<div class="clearfix"></div>
-					<h2 class="section-heading">One card, two networks</h2>
+					<h2 class="section-heading">What is it and why is it better?</h2>
 					<p class="lead">
-						We'll automatically use your Dwolla account when you charge
-						your credit card at participating merchants. When they don't,
-						your card will function as normal.</p>
+						<a href="https://www.dwolla.com">Dwolla</a> is an incredibly low-cost
+						payment network. Unfortunately, it's pretty painful to use in practice.
+						You have to remember all of the shops who accept it. And you have to
+						go through the song and dance of paying with your mobile phone.
+						We solve that, using your existing card to pay through Dwolla
+						(saving the fees).
+					</p>
 				</div>
-				<div class="col-lg-5 col-lg-offset-2 col-sm-6">
-					<img class="img-responsive" src="img/ipad.png" alt="">
+				<div class="col-lg-5 col-sm-pull-6  col-sm-6" id="yt-container">
+					<iframe id="yt-content" src="//www.youtube.com/embed/QMRPPXkMWYQ" frameborder="0" allowfullscreen></iframe>
 				</div>
 			</div>
 
@@ -102,23 +108,25 @@
 		<div class="container">
 
 			<div class="row">
-				<div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+				<div class="col-lg-5 col-sm-6">
 					<hr class="section-heading-spacer">
 					<div class="clearfix"></div>
-					<h2 class="section-heading">Link once, works always</h2>
+					<h2 class="section-heading">One card, two networks</h2>
 					<p class="lead">
-						Once you setup your credit card to link with your Dwolla account
-						you're good to go. There's no longer any need to try to memorize
-						all of the merchants who take Dwolla.
+						We'll automatically use your Dwolla account when you charge
+						your existing credit card at participating merchants.
+						Your card will function as normal at all other merchants.
+						You get the low costs of the Dwolla with the ease of use
+						of a credit card.
 					</p>
 				</div>
-				<div class="col-lg-5 col-sm-pull-6  col-sm-6">
-					<img class="img-responsive" src="img/doge.png" alt="">
+				<div class="col-lg-5 col-lg-offset-2 col-sm-6">
+					<img class="img-responsive" src="img/logo.png" alt="">
 				</div>
 			</div>
 
 		</div>
-		<!-- /.container -->
+		<!-- /.container -->		
 
 	</div>
 	<!-- /.content-section-b -->
@@ -133,9 +141,11 @@
 					<div class="clearfix"></div>
 					<h2 class="section-heading">Safe and Secure</h2>
 					<p class="lead">
-						We'll never store your credit card number. We encrypt it with a secure
-						one-way hash function. Even we won't be able to retrieve
-						the original card number once your account is setup.
+						We never store your credit card number. We immediately
+						encrypt it with a secure one-way hash function. Even we
+						won't be able to retrieve the original card number once
+						your account is setup.
+						<a href="https://github.com/yeldarby/cardwolla">View the source code on Github</a>.
 					</p>
 				</div>
 				<div class="col-lg-5 col-lg-offset-2 col-sm-6">
@@ -155,7 +165,7 @@
 
 			<div class="row">
 				<div class="col-lg-6">
-					<h2>Get started. Connect your Dwolla:</h2>
+					<h2>Get started now.<br />Connect your Dwolla:</h2>
 				</div>
 				<div class="col-lg-6">
 					<ul class="list-inline banner-social-buttons">
@@ -164,6 +174,7 @@
 								<i class="fa fa-sign-in fa-fw"></i>
 								<span class="network-name">Dwolla</span>
 							</a>
+							<div class="sign-in-text"><a href="#" class="connect">Sign in with Dwolla</a></div>
 						</li>
 					</ul>
 				</div>

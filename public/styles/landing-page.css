@@ -102,6 +102,8 @@ body, h1, h2, h3, h4, h5, h6 {
 	background: url(../img/banner-bg.jpg) no-repeat center center;
 	background-size: cover;
 	text-align: center;
+	
+	background: rgb(255,127,4); /* Old browsers */
 }
 
 .banner h2 {
@@ -118,6 +120,7 @@ body, h1, h2, h3, h4, h5, h6 {
 	float: right;
 	margin-top: 0;
 	width: 100%;
+	padding-top: 10px;
 }
 
 @media (max-width: 1199px) {
@@ -287,4 +290,36 @@ p.copyright {
 #scan_card, #email_container {
 	margin-top: 30px;
 	margin-bottom: 30px;
+}
+
+.sign-in-text {
+	margin-top: 5px;
+	text-transform: uppercase;
+	text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.6);
+}
+
+.sign-in-text a {
+	color: white;
+}
+
+#yt-container {
+	position: relative;
+	width: 50%;		/* desired width */
+}
+
+#yt-container:before {
+	content: "";
+	display: block;
+	padding-top: 75%; 	/* initial ratio of 1:1*/
+}
+
+#yt-content {
+	position:  absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	width:90%;
+	height:70%;
+	margin: auto;
 }
